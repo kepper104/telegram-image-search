@@ -82,7 +82,8 @@ def increase_offset(query):
 
 
 def get_picture(query):
-    while True:
+    attempts = 5
+    for i in range(attempts):
         current_offset = get_offset(query)
 
         res = try_to_get_picture(current_offset, query)
