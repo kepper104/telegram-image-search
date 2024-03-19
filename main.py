@@ -76,12 +76,11 @@ def get_offset_gif(query):
     try:
         with open(f"offset_gif_{query}.txt", "r") as f:
             offset = f.read().strip()
-            return int(offset)
+            return offset
 
     except Exception:
         with open(f"offset_gif_{query}.txt", "w") as f:
-            f.write("0")
-            return 0
+            return ""
 
 def get_query():
     try:
@@ -128,10 +127,9 @@ def increase_offset(query):
     with open(f"offset_{query}.txt", "w") as f:
         f.write(str(cur_offset + 10))
 
-def increase_offset_gif(query):
-    cur_offset = get_offset_gif(query)
+def set_offset_gif(query, offset):
     with open(f"offset_gif_{query}.txt", "w") as f:
-        f.write(str(cur_offset + 2))
+        f.write(str(offset))
 
 
 def get_picture(query):
@@ -154,9 +152,12 @@ def get_gif(query):
 
         res = try_to_get_gif(current_offset, query)
 
-        if "error" in res:
+        if "error" in res and "new_offset" in res:
             print("Error, retrying", res["error"])
-            increase_offset_gif(query)
+            set_offset_gif(query, res["new_offset"])
+        elif "error" in res:
+            print("Error, retrying", res["error"])
+
         else:
             return res
 
@@ -198,8 +199,6 @@ def try_to_get_picture(current_offset=0, custom_query=None):
         if "tiktok" in random_link:
             continue
         if random_link not in used_links:
-            print("Writing to used!")
-            print("Done!")
             with open(f"used_links_{query}.txt", "a") as f:
                 f.write(random_link + "\n")
             return random_link
@@ -209,7 +208,7 @@ def try_to_get_picture(current_offset=0, custom_query=None):
     return {"error": "all links used"}
 
 
-def try_to_get_gif(current_offset=0, custom_query=None):
+def try_to_get_gif(current_offset="", custom_query=None):
     if custom_query is None:
         query = get_query_gif()
     else:
@@ -251,8 +250,6 @@ def try_to_get_gif(current_offset=0, custom_query=None):
         # print(random_link)
 
         if random_link not in used_links:
-            print("Writing to used!")
-            print("Done!")
             print(f"Sending {random_link}")
             with open(f"used_links_gif_{query}.txt", "a") as f:
                 f.write(random_link + "\n")
@@ -260,7 +257,8 @@ def try_to_get_gif(current_offset=0, custom_query=None):
         else:
             print("Link already used...")
             continue
-    return {"error": "all links used"}
+
+    return {"error": "all links used", "new_offset": json["next"]}
 
 
 bot.infinity_polling()
