@@ -2,7 +2,7 @@ import requests
 import random
 import telebot
 
-from config import API_KEY, search_engine_id, BOT_TOKEN
+from config import GOOGLE_API_KEY, search_engine_id, BOT_TOKEN
 
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -101,7 +101,7 @@ def try_to_get_picture(current_offset=0, custom_query=None):
     else:
         query = custom_query
 
-    url = f"https://customsearch.googleapis.com/customsearch/v1?cx={search_engine_id}&q={query}&searchType=image&key={API_KEY}&start={current_offset}"
+    url = f"https://customsearch.googleapis.com/customsearch/v1?cx={search_engine_id}&q={query}&searchType=image&key={GOOGLE_API_KEY}&start={current_offset}"
 
     res = requests.get(url)
 
